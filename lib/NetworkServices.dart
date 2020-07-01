@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'Pokemon.dart';
+import 'PokemonData.dart';
 import 'dart:convert';
 
 class NetworkServices {

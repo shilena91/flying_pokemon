@@ -7,8 +7,6 @@ import 'dart:convert';
 FlyingPokemon FlyingPokemonFromJson(String str) =>
     FlyingPokemon.fromJson(json.decode(str));
 
-String FlyingPokemonToJson(FlyingPokemon data) => json.encode(data.toJson());
-
 class FlyingPokemon {
   FlyingPokemon({
     this.pokemon,
@@ -22,10 +20,6 @@ class FlyingPokemon {
             List<Pokemon>.from(json["pokemon"].map((x) => Pokemon.fromJson(x))),
       );
   }
-
-  Map<String, dynamic> toJson() => {
-        "pokemon": List<dynamic>.from(pokemon.map((x) => x.toJson())),
-      };
 }
 
 class Generation {
@@ -66,8 +60,18 @@ class Pokemon {
       );
   }
   
-  Map<String, dynamic> toJson() => {
-        "pokemon": pokemon.toJson(),
-        "slot": slot,
+  static Map<String, dynamic> toMap(Pokemon pokemon) => {
+        "pokemon": pokemon.pokemon,
+        "slot": pokemon.slot,
       };
+
+  static String encodePokemon(List<Pokemon> pokemons) => json.encode(
+    pokemons
+      .map<Map<String, dynamic>>((pokemon) => Pokemon.toMap(pokemon)).toList(),
+  );
+
+  static List<Pokemon> decodePokemons(String pokemons) {
+    print("decode");
+    return (json.decode(pokemons)).map<Pokemon>((item) => Pokemon.fromJson(item)).toList();
+  }
 }

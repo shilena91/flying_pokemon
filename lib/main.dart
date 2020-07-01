@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'PersistenceManager.dart';
 import 'NetworkServices.dart';
-import 'Pokemon.dart';
+import 'PokemonData.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,7 +29,8 @@ class FlyingPokemonList extends StatefulWidget {
 
 class FlyingPokemonListState extends State<FlyingPokemonList> {
   Future<List<Pokemon>> flyingPokemons;
-  final favouritePokemon = Set<Pokemon>();
+  PersistenceManager persistenceManager = PersistenceManager();
+  var favoritePokemon = List<Pokemon>();
   bool loading;
 
   @override
@@ -35,6 +38,7 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
     super.initState();
     loading = true;
     flyingPokemons = NetworkServices().getPokemons();
+    loadFavourites();
   }
 
   @override
@@ -103,7 +107,7 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
   Widget buildRow(List<Pokemon> pokemonList, int index) {
     final pokemonInThisRow = pokemonList[index];
     final pokemonName = pokemonInThisRow.pokemon.name;
-    final alreadySaved = favouritePokemon.contains(pokemonInThisRow);
+    bool alreadySaved = checkAlreadySaved(favoritePokemon, pokemonInThisRow);
 
     return ListTile(
       title: Text(
@@ -115,18 +119,41 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
       ),
       onTap: () {
         setState(() {
+          print(alreadySaved);
+          print(favoritePokemon);
           alreadySaved
-              ? favouritePokemon.remove(pokemonInThisRow)
-              : favouritePokemon.add(pokemonInThisRow);
+              ? favoritePokemon.removeWhere((item) => item.pokemon.name == pokemonInThisRow.pokemon.name)
+              : favoritePokemon.add(pokemonInThisRow);
+          print(favoritePokemon);
+          persistenceManager.save(favoritePokemon);
         });
       },
     );
   }
 
+  loadFavourites() {
+    persistenceManager.load().then((value) {
+      favoritePokemon = value;
+    }).catchError((e) => print(e));
+  }
+
+  bool checkAlreadySaved(List<Pokemon> favorite, Pokemon pokemon) {
+    final name = pokemon.pokemon.name;
+    bool saved = false;
+
+    favorite.forEach((element) {
+      if (element.pokemon.name == name) {
+        saved = true;
+        return;
+      }
+    });
+    return saved;
+  }
+
   void goToSaveRoute() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (BuildContext context) {
-        final tiles = favouritePokemon.map((Pokemon pokemon) {
+        final tiles = favoritePokemon.map((Pokemon pokemon) {
           return ListTile(
             title: Text(
               pokemon.pokemon.name,
