@@ -1,11 +1,4 @@
-// To parse this JSON data, do
-//
-//     final FlyingPokemon = FlyingPokemonFromJson(jsonString);
-
 import 'dart:convert';
-
-FlyingPokemon FlyingPokemonFromJson(String str) =>
-    FlyingPokemon.fromJson(json.decode(str));
 
 class FlyingPokemon {
   FlyingPokemon({

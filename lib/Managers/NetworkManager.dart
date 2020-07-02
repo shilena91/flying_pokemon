@@ -1,8 +1,8 @@
 import 'package:http/http.dart' as http;
-import 'PokemonData.dart';
+import '../Model/PokemonData.dart';
 import 'dart:convert';
 
-class NetworkServices {
+class NetworkManager {
   static const String url = 'https://pokeapi.co/api/v2/type/3/';
 
   Future<List<Pokemon>> getPokemons() async {

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'PersistenceManager.dart';
-import 'NetworkServices.dart';
-import 'PokemonData.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'Managers/PersistenceManager.dart';
+import 'Managers/NetworkManager.dart';
+import 'Model/PokemonData.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +14,6 @@ class MyApp extends StatelessWidget {
       title: 'Pokemon',
       home: FlyingPokemonList(),
     );
-    throw UnimplementedError();
   }
 }
 
@@ -23,13 +21,12 @@ class FlyingPokemonList extends StatefulWidget {
   @override
   FlyingPokemonListState createState() {
     return FlyingPokemonListState();
-    throw UnimplementedError();
   }
 }
 
 class FlyingPokemonListState extends State<FlyingPokemonList> {
   Future<List<Pokemon>> flyingPokemons;
-  PersistenceManager persistenceManager = PersistenceManager();
+  PersistenceManager persistenceManager = PersistenceManager.shared;
   var favoritePokemon = List<Pokemon>();
   bool loading;
 
@@ -37,7 +34,7 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
   void initState() {
     super.initState();
     loading = true;
-    flyingPokemons = NetworkServices().getPokemons();
+    flyingPokemons = NetworkManager().getPokemons();
     loadFavourites();
   }
 
@@ -54,14 +51,13 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            flyingPokemons = NetworkServices().getPokemons();
+            flyingPokemons = NetworkManager().getPokemons();
           });
         },
         backgroundColor: Colors.blue,
         child: Icon(Icons.update),
       ),
     );
-    throw UnimplementedError();
   }
 
   Widget bodyPokemonList() {
@@ -72,7 +68,7 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
             if (pokemonSnap.hasData) {
               return ListView.builder(
                 padding: EdgeInsets.all(16.0),
-                itemCount: pokemonSnap.data.length,
+                itemCount: (pokemonSnap.data.length * 2) - 1,
                 itemBuilder: (context, i) {
                   if (i.isOdd) return Divider();
                   final index = i ~/ 2;
@@ -84,24 +80,6 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
           }
           return Center(child: CircularProgressIndicator());
         });
-
-    // return ListView.builder(
-    //   padding: EdgeInsets.all(16.0),
-    //   itemBuilder: (context, i) {
-    //     if (i.isOdd) return Divider();
-    //     final index = i ~/ 2;
-    //     flyingPokemons = FutureBuilder<FlyingPokemon>(
-    //       future: fetchedData,
-    //       builder: (context, snapshot) {
-    //         if (snapshot.hasData) {
-    //           return snapshot.data.pokemon;
-    //         }
-    //       }
-    //       );
-
-    //     return buildRow(flyingPokemons[index]);
-    //   },
-    //   );
   }
 
   Widget buildRow(List<Pokemon> pokemonList, int index) {
@@ -122,7 +100,8 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
           print(alreadySaved);
           print(favoritePokemon);
           alreadySaved
-              ? favoritePokemon.removeWhere((item) => item.pokemon.name == pokemonInThisRow.pokemon.name)
+              ? favoritePokemon.removeWhere(
+                  (item) => item.pokemon.name == pokemonInThisRow.pokemon.name)
               : favoritePokemon.add(pokemonInThisRow);
           print(favoritePokemon);
           persistenceManager.save(favoritePokemon);
@@ -153,23 +132,40 @@ class FlyingPokemonListState extends State<FlyingPokemonList> {
   void goToSaveRoute() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (BuildContext context) {
-        final tiles = favoritePokemon.map((Pokemon pokemon) {
-          return ListTile(
-            title: Text(
-              pokemon.pokemon.name,
-            ),
-          );
-        });
-        final divided = ListTile.divideTiles(
-          context: context,
-          tiles: tiles,
-        ).toList();
-
         return Scaffold(
           appBar: AppBar(
             title: Text('Favourite Flying Pokemons'),
           ),
-          body: ListView(children: divided),
+          body: ListView.builder(
+              itemCount: (favoritePokemon.length * 2) - 1,
+              itemBuilder: (context, i) {
+                if (i.isOdd)
+                  return Divider(
+                    height: 0.0,
+                  );
+                final index = i ~/ 2;
+                final item = favoritePokemon[index].pokemon.name;
+
+                return Dismissible(
+                  direction: DismissDirection.endToStart,
+                  key: Key(item),
+                  onDismissed: (direction) {
+                    setState(() {
+                      favoritePokemon.removeAt(i);
+                      persistenceManager.save(favoritePokemon);
+                    });
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('$item deleted!'),
+                    ));
+                  },
+                  background: Container(
+                    alignment: AlignmentDirectional.centerEnd,
+                    color: Colors.red,
+                    child: Icon(Icons.delete, color: Colors.white),
+                  ),
+                  child: ListTile(title: Text('$item')),
+                );
+              }),
         );
       }),
     );

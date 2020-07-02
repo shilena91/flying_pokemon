@@ -1,13 +1,10 @@
-import 'package:flying_pokemon/PokemonData.dart';
+import 'package:flying_pokemon/Model/PokemonData.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'PokemonData.dart';
-
-enum PersistenceActionType {
-  add, remove
-}
+import '../Model/PokemonData.dart';
 
 class PersistenceManager {
   final key = 'favorite';
+  static final shared = PersistenceManager();
 
   load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -19,6 +16,5 @@ class PersistenceManager {
   save(List<Pokemon> favorites) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, Pokemon.encodePokemon(favorites));
-    print("saved");
   }
 }
