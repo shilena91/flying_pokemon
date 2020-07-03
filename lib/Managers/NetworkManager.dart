@@ -3,15 +3,14 @@ import '../Model/PokemonData.dart';
 import 'dart:convert';
 
 class NetworkManager {
-  static const String url = 'https://pokeapi.co/api/v2/type/3/';
+  static const String _url = 'https://pokeapi.co/api/v2/type/3/';
 
   Future<List<Pokemon>> getPokemons() async {
-    final response = await http.get(url);
+    final _response = await http.get(_url);
 
-    if (response.statusCode == 200) {
-      return FlyingPokemon.fromJson(json.decode(response.body)).pokemon;
-    }
-    else {
+    if (_response.statusCode == 200) {
+      return FlyingPokemon.fromJson(json.decode(_response.body)).pokemon;
+    } else {
       throw Exception('Failed to fetch pokemon data');
     }
   }

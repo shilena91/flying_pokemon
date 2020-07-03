@@ -3,18 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/PokemonData.dart';
 
 class PersistenceManager {
-  final key = 'favorite';
+  final _key = 'favorite';
   static final shared = PersistenceManager();
 
   load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final data = prefs.getString(key);
+    final _prefs = await SharedPreferences.getInstance();
+    final _data = _prefs.getString(_key);
 
-    return Pokemon.decodePokemons(data);
+    return Pokemon.decodePokemons(_data);
   }
 
   save(List<Pokemon> favorites) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, Pokemon.encodePokemon(favorites));
+    final _prefs = await SharedPreferences.getInstance();
+    _prefs.setString(_key, Pokemon.encodePokemon(favorites));
   }
 }

@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 class FlyingPokemon {
+  List<Pokemon> pokemon;
+
   FlyingPokemon({
     this.pokemon,
   });
 
-  List<Pokemon> pokemon;
-
   factory FlyingPokemon.fromJson(Map<String, dynamic> json) {
     return FlyingPokemon(
-        pokemon:
-            List<Pokemon>.from(json["pokemon"].map((x) => Pokemon.fromJson(x))),
-      );
+      pokemon:
+          List<Pokemon>.from(json["pokemon"].map((x) => Pokemon.fromJson(x))),
+    );
   }
 }
 
@@ -26,9 +26,9 @@ class Generation {
 
   factory Generation.fromJson(Map<String, dynamic> json) {
     return Generation(
-        name: json["name"],
-        url: json["url"],
-      );
+      name: json["name"],
+      url: json["url"],
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -48,23 +48,27 @@ class Pokemon {
 
   factory Pokemon.fromJson(Map<String, dynamic> json) {
     return Pokemon(
-        pokemon: Generation.fromJson(json["pokemon"]),
-        slot: json["slot"],
-      );
+      pokemon: Generation.fromJson(json["pokemon"]),
+      slot: json["slot"],
+    );
   }
-  
+
   static Map<String, dynamic> toMap(Pokemon pokemon) => {
         "pokemon": pokemon.pokemon,
         "slot": pokemon.slot,
       };
 
-  static String encodePokemon(List<Pokemon> pokemons) => json.encode(
-    pokemons
-      .map<Map<String, dynamic>>((pokemon) => Pokemon.toMap(pokemon)).toList(),
-  );
+  static String encodePokemon(List<Pokemon> pokemons) {
+    return json.encode(
+      pokemons
+          .map<Map<String, dynamic>>((pokemon) => Pokemon.toMap(pokemon))
+          .toList(),
+    );
+  }
 
   static List<Pokemon> decodePokemons(String pokemons) {
-    print("decode");
-    return (json.decode(pokemons)).map<Pokemon>((item) => Pokemon.fromJson(item)).toList();
+    return (json.decode(pokemons))
+        .map<Pokemon>((item) => Pokemon.fromJson(item))
+        .toList();
   }
 }
