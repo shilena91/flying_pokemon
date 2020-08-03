@@ -1,6 +1,6 @@
 # flying_pokemon
 
-A new Flutter project, the challenge is displaying a list of pokemons from an API.
+My first Flutter project, the challenge is displaying a list of pokemons from an API. I spent 5 days to do this, including learning Flutter from scratch.
 
 ## Usage (for MacOS)
 - Clone the repo.
