@@ -1,6 +1,6 @@
 # flying_pokemon
 
-My first Flutter project, the challenge is displaying a list of pokemons from an API. I spent 5 days to do this, including learning Flutter from scratch.
+My first Flutter project, a coding assignment from a company in Finland. The challenge is displaying a list of pokemons from an API. I spent 5 days to do this, including learning Flutter from scratch.
 
 ## Usage (for MacOS)
 - Clone the repo.
